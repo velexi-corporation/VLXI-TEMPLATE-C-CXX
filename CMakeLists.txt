@@ -2,7 +2,7 @@
 # CMake initialization
 # ----------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(XYZ
         LANGUAGES C CXX
         VERSION 0.1.0)
@@ -26,10 +26,10 @@ set(CMAKE_C_FLAGS "${CFLAGS} ${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
 # Set path variables
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
-set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
 set(BINARY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
 
 # Set search paths for header files
 include_directories(${BINARY_INCLUDE_DIR})
@@ -62,7 +62,7 @@ else (IWYU)
 endif (IWYU)
 
 # ----------------------------------------------------------------------
-# Define build targets
+# Build targets
 # ----------------------------------------------------------------------
 
 # library
@@ -96,15 +96,14 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 
 # Generate cmake_uninstall.cmake file
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    "${CMAKE_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY
 )
 
 # Define `uninstall` target
 add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND}
-            -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake
 )
 
 # ----------------------------------------------------------------------
