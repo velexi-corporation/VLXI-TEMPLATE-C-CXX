@@ -36,6 +36,27 @@ include_directories(${BINARY_INCLUDE_DIR})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # ----------------------------------------------------------------------
+# Install parameters
+# ----------------------------------------------------------------------
+
+# Set root directory (relative) for installed header files
+execute_process(
+    COMMAND "echo" ${CMAKE_PROJECT_NAME}
+    COMMAND "tr" '[:upper:]' '[:lower:]'
+    OUTPUT_VARIABLE get_project_name_lower_out
+    RESULT_VARIABLE get_project_name_lower_result_var
+    )
+
+if (NOT "${get_project_name_lower_result_var}" STREQUAL 0)
+    message(FATAL_ERROR "Unable to root directory for installed header files")
+endif (NOT "${get_project_name_lower_result_var}" STREQUAL 0)
+#string(STRIP include/${get_project_name_lower_out} INSTALL_INCLUDE_DIR)
+set(INSTALL_INCLUDE_DIR include)
+
+# Set root directory (relative) for installed library files
+set(INSTALL_LIB_DIR lib)
+
+# ----------------------------------------------------------------------
 # Build requirements
 # ----------------------------------------------------------------------
 
