@@ -89,9 +89,6 @@ endif (IWYU)
 # library
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
-# examples
-add_subdirectory(examples EXCLUDE_FROM_ALL)
-
 # ----------------------------------------------------------------------
 # Testing
 # ----------------------------------------------------------------------
@@ -99,11 +96,11 @@ add_subdirectory(examples EXCLUDE_FROM_ALL)
 # Enable CMake testing
 enable_testing()
 
-# Add googletest directory to build
+# Add googletest to build
 add_subdirectory(${EXT_PROJECTS_DIR}/googletest)
 
-# Add test directory to build
-add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+# Add tests to build
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
 
 # ----------------------------------------------------------------------
 # Installation
@@ -182,5 +179,5 @@ file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
 # --- Process template files
 
 # Generate configuration header files
-configure_file(config/xyz_config.h.in
+configure_file(include/xyz_config.h.in
                ${BINARY_INCLUDE_DIR}/xyz_config.h)
