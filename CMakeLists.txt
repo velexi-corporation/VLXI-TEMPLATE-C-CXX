@@ -29,7 +29,7 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 set(BINARY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
+set(EXT_PROJECTS_DIR ext)
 
 # Set search paths for header files
 include_directories(${BINARY_INCLUDE_DIR})
@@ -87,7 +87,7 @@ endif (IWYU)
 # ----------------------------------------------------------------------
 
 # library
-add_subdirectory(${PROJECT_SOURCE_DIR}/src)
+add_subdirectory(src)
 
 # ----------------------------------------------------------------------
 # Testing
@@ -100,7 +100,7 @@ enable_testing()
 add_subdirectory(${EXT_PROJECTS_DIR}/googletest)
 
 # Add tests to build
-add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
+add_subdirectory(tests)
 
 # ----------------------------------------------------------------------
 # Installation
