@@ -18,7 +18,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
 
 # -----------------------------------------------------------------------------
-# Requirements
+# Build requirements
 # -----------------------------------------------------------------------------
 
 # --- Compiler requirements
