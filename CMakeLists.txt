@@ -18,7 +18,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
 
 # -----------------------------------------------------------------------------
-# Build - Requirements
+# Requirements
 # -----------------------------------------------------------------------------
 
 # --- Compiler requirements
@@ -44,7 +44,7 @@ else (IWYU)
 endif (IWYU)
 
 # -----------------------------------------------------------------------------
-# Build - Parameters
+# Parameters (Build)
 # -----------------------------------------------------------------------------
 
 # Construct name to use for package-specific directories (e.g., header files)
@@ -80,42 +80,7 @@ include_directories(${BINARY_INCLUDE_DIR})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # -----------------------------------------------------------------------------
-# Build - Targets
-# -----------------------------------------------------------------------------
-
-# library
-add_subdirectory(src)
-
-# -----------------------------------------------------------------------------
-# Build - Preparations
-# -----------------------------------------------------------------------------
-
-# --- Create build directories
-
-file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
-file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
-
-# --- Process template files
-
-# Generate configuration header files
-configure_file(include/xyz_config.h.in
-               ${HEADER_OUTPUT_PATH}/xyz_config.h)
-
-# -----------------------------------------------------------------------------
-# Testing
-# -----------------------------------------------------------------------------
-
-# Enable CMake testing
-enable_testing()
-
-# Add googletest to build
-add_subdirectory(${EXT_PROJECTS_DIR}/googletest EXCLUDE_FROM_ALL)
-
-# Add tests to build
-add_subdirectory(tests EXCLUDE_FROM_ALL)
-
-# -----------------------------------------------------------------------------
-# Install - Parameters
+# Parameters (Install)
 # -----------------------------------------------------------------------------
 
 # Set directory (relative) for installed executables
@@ -128,7 +93,14 @@ set(INSTALL_HEADER_PATH include/${PKG_DIR_NAME})
 set(INSTALL_LIB_PATH lib)
 
 # -----------------------------------------------------------------------------
-# Install - Targets
+# Targets (Build)
+# -----------------------------------------------------------------------------
+
+# library
+add_subdirectory(src)
+
+# -----------------------------------------------------------------------------
+# Targets (Install)
 # -----------------------------------------------------------------------------
 
 # --- Header files
@@ -155,7 +127,20 @@ add_custom_target(uninstall
 )
 
 # -----------------------------------------------------------------------------
-# Source code distribution
+# Targets (Testing)
+# -----------------------------------------------------------------------------
+
+# Enable CMake testing
+enable_testing()
+
+# Add googletest to build
+add_subdirectory(${EXT_PROJECTS_DIR}/googletest EXCLUDE_FROM_ALL)
+
+# Add tests to build
+add_subdirectory(tests EXCLUDE_FROM_ALL)
+
+# -----------------------------------------------------------------------------
+# Targets (Distribution)
 # -----------------------------------------------------------------------------
 
 if (GIT_FOUND)
@@ -196,3 +181,18 @@ fi"
 
     endif (UNIX)
 endif (GIT_FOUND)
+
+# -----------------------------------------------------------------------------
+# Build preparations
+# -----------------------------------------------------------------------------
+
+# --- Create build directories
+
+file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
+file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
+
+# --- Process template files
+
+# Generate configuration header files
+configure_file(include/xyz_config.h.in
+               ${HEADER_OUTPUT_PATH}/xyz_config.h)
