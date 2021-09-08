@@ -18,7 +18,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
 
 # -----------------------------------------------------------------------------
-# Build requirements
+# Build - requirements
 # -----------------------------------------------------------------------------
 
 # --- Compiler requirements
@@ -44,7 +44,7 @@ else (IWYU)
 endif (IWYU)
 
 # -----------------------------------------------------------------------------
-# Build parameters
+# Build - parameters
 # -----------------------------------------------------------------------------
 
 # Construct name to use for package-specific directories (e.g., header files)
@@ -80,14 +80,14 @@ include_directories(${BINARY_INCLUDE_DIR})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # -----------------------------------------------------------------------------
-# Build targets
+# Build - targets
 # -----------------------------------------------------------------------------
 
 # library
 add_subdirectory(src)
 
 # -----------------------------------------------------------------------------
-# Build preparations
+# Build - preparations
 # -----------------------------------------------------------------------------
 
 # --- Create build directories
@@ -115,7 +115,7 @@ add_subdirectory(${EXT_PROJECTS_DIR}/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(tests EXCLUDE_FROM_ALL)
 
 # -----------------------------------------------------------------------------
-# Install parameters
+# Install - parameters
 # -----------------------------------------------------------------------------
 
 # Set directory (relative) for installed executables
@@ -128,7 +128,7 @@ set(INSTALL_HEADER_PATH include/${PKG_DIR_NAME})
 set(INSTALL_LIB_PATH lib)
 
 # -----------------------------------------------------------------------------
-# Install targets
+# Install - targets
 # -----------------------------------------------------------------------------
 
 # --- Header files
