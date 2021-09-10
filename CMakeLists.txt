@@ -96,7 +96,15 @@ set(INSTALL_LIB_PATH lib)
 # Targets (Build)
 # -----------------------------------------------------------------------------
 
-# library
+# Build directories
+add_custom_target(make-bin-dir
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${EXECUTABLE_OUTPUT_PATH})
+add_custom_target(make-header-dir
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${HEADER_OUTPUT_PATH})
+add_custom_target(make-lib-dir
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${LIBRARY_OUTPUT_PATH})
+
+# Libraries
 add_subdirectory(src)
 
 # -----------------------------------------------------------------------------
@@ -185,11 +193,6 @@ endif (GIT_FOUND)
 # -----------------------------------------------------------------------------
 # Build preparations
 # -----------------------------------------------------------------------------
-
-# --- Create build directories
-
-file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
-file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
 
 # --- Process template files
 
