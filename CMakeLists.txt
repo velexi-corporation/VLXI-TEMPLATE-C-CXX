@@ -1,47 +1,57 @@
-# --------------------------------------------------------------
-# CMake initialization
-# --------------------------------------------------------------
+# ==========================================================================================
+# Main CMakeLists.txt
+# ==========================================================================================
 
-cmake_minimum_required(VERSION 3.5)
-project(PKG
+# ------------------------------------------------------------------------------------------
+# CMake Configuration
+# ------------------------------------------------------------------------------------------
+
+# --- Initialization
+
+cmake_minimum_required(VERSION 3.10)
+project(XYZ
         LANGUAGES C CXX
         VERSION 0.1.0)
 
-# --------------------------------------------------------------
-# Configuration options
-# --------------------------------------------------------------
+# --- Configuration parameters
+
+# Build type
+set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
+
+# Compiler requirements
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# ------------------------------------------------------------------------------------------
+# Build Options
+# ------------------------------------------------------------------------------------------
 
 # Build shared libraries
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
-# CMake build type
-set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
+# Floating-point precision
+option(USE_SINGLE_PRECISION "Build single-precision libraries" OFF)
+if (USE_SINGLE_PRECISION)
+    message("-- Setting floating-point precision to 'single'")
+else (USE_SINGLE_PRECISION)
+    message("-- Setting floating-point precision to 'double'")
+endif (USE_SINGLE_PRECISION)
 
-# --------------------------------------------------------------
-# Build parameters
-# --------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
+# Imported Modules
+# ------------------------------------------------------------------------------------------
 
-# Path variables
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/lib)
-set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
-set(BINARY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
+# --- CMake modules
 
-# Compiler flags
-set(CMAKE_C_FLAGS "${CFLAGS} ${CMAKE_C_FLAGS}")
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
+# Packaging
+include(CMakePackageConfigHelpers)
 
-# Search path for header files
-include_directories(${BINARY_INCLUDE_DIR})
+# Make cache variables for install destinations
+include(GNUInstallDirs)
 
-# CMake options
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# --------------------------------------------------------------
-# Build requirements
-# --------------------------------------------------------------
-
-# --- Software with pre-defined CMake package modules
+# --- External CMake-compatible packages
 
 find_package(Threads REQUIRED)
 find_package(Git)
@@ -58,76 +68,126 @@ else (IWYU)
             "Analysis of #includes will be skipped.")
 endif (IWYU)
 
-# --------------------------------------------------------------
-# Process template files
-# --------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
+# Parameters
+# ------------------------------------------------------------------------------------------
+
+# --- Build parameters
+
+# Package name
+set(PKG_NAME ${CMAKE_PROJECT_NAME})
+
+# Construct name to use for package-specific directories (e.g., header files)
+execute_process(
+    COMMAND "echo" ${PKG_NAME}
+    COMMAND "tr" '[:upper:]' '[:lower:]'
+    OUTPUT_VARIABLE get_project_name_lower_out
+    RESULT_VARIABLE get_project_name_lower_result_var
+    )
+if (NOT "${get_project_name_lower_result_var}" STREQUAL 0)
+    message(FATAL_ERROR "Error constructing directory name for package")
+endif (NOT "${get_project_name_lower_result_var}" STREQUAL 0)
+string(STRIP ${get_project_name_lower_out} PKG_DIR_NAME)
+
+# Set path variables
+set(BINARY_INCLUDEDIR ${CMAKE_BINARY_DIR}/include)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(EXT_PROJECTS_DIR ext)
+
+# Compiler flags
+
+# --- Install parameters
+
+# Set directory (relative) for installed header files
+set(INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/${PKG_DIR_NAME})
+
+# ------------------------------------------------------------------------------------------
+# Build
+# ------------------------------------------------------------------------------------------
+
+# --- Process template files
+
+# Floating-point precision
+if (USE_SINGLE_PRECISION)
+
+    set(XYZ_REAL "float")
+    set(XYZ_ZERO_APPROX 1.e-5)
+    set(XYZ_REAL_MAX "FLT_MAX")
+    set(XYZ_REAL_MIN "FLT_MIN")
+    set(XYZ_REAL_EPSILON "FLT_EPSILON")
+
+else (USE_SINGLE_PRECISION)
+
+    set(XYZ_DOUBLE_PRECISION ON)
+
+    set(XYZ_REAL "double")
+    set(XYZ_ZERO_APPROX 1.e-11)
+    set(XYZ_REAL_MAX "DBL_MAX")
+    set(XYZ_REAL_MIN "DBL_MIN")
+    set(XYZ_REAL_EPSILON "DBL_EPSILON")
+
+endif (USE_SINGLE_PRECISION)
 
 # Generate configuration header files
-configure_file(config/PKG_config.h.in
-               ${BINARY_INCLUDE_DIR}/PKG_config.h)
+configure_file(include/xyz_config.h.in
+               ${BINARY_INCLUDEDIR}/xyz_config.h)
 
-# --------------------------------------------------------------
-# Build targets
-# --------------------------------------------------------------
+# Copy CMake configuration files
+file(COPY ${CMAKE_SOURCE_DIR}/cmake/${PKG_NAME}ConfigExtras.cmake
+     DESTINATION ${CMAKE_BINARY_DIR}/cmake
+)
 
-# library
-add_subdirectory(${PROJECT_SOURCE_DIR}/src)
+# --- Targets
 
-# examples
-add_subdirectory(examples EXCLUDE_FROM_ALL)
+# Libraries
+add_subdirectory(src)
 
-# --------------------------------------------------------------
-# Testing
-# --------------------------------------------------------------
+# CMake configuration files
+add_custom_target(cmake-config-files ALL
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/cmake/${PKG_NAME}ConfigExtras.cmake
+    ${CMAKE_BINARY_DIR}/cmake/${PKG_NAME}ConfigExtras.cmake
+)
+
+# ------------------------------------------------------------------------------------------
+# Test
+# ------------------------------------------------------------------------------------------
 
 # Enable CMake testing
 enable_testing()
 
-# Emulate 'make check'
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+# GoogleTest
+add_subdirectory(${EXT_PROJECTS_DIR}/googletest EXCLUDE_FROM_ALL)
 
-# Add googletest directory to build
-add_subdirectory(${EXT_PROJECTS_DIR}/googletest)
+# Tests
+add_subdirectory(tests EXCLUDE_FROM_ALL)
 
-# Add test directory to build
-add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+# ------------------------------------------------------------------------------------------
+# Package
+# ------------------------------------------------------------------------------------------
 
-# --------------------------------------------------------------
-# Installation
-# --------------------------------------------------------------
-
-# Header files
-#file(GLOB HEADER_FILES ${SRCDIR}/*.h)
-#install(FILES ${HEADER_FILES} DESTINATION include)
-
-# Library files
-#install(TARGETS lsm_parallel DESTINATION lib)
-
-# Executable files
-# TODO
-
-# --- Add `uninstall` target
-
-# Generate cmake_uninstall.cmake file
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY
+# Create package configuration file
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PKG_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PKG_NAME}
 )
 
-# Define `uninstall` target
-add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND}
-            -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+# Create package version file
+set_property(TARGET xyz PROPERTY VERSION ${XYZ_VERSION})
+set_property(TARGET xyz PROPERTY INTERFACE_XYZ_MAJOR_VERSION ${XYZ_VERSION_MAJOR})
+set_property(TARGET xyz APPEND PROPERTY COMPATIBLE_INTERFACE_STRING XYZ_MAJOR_VERSION)
+write_basic_package_version_file(
+    ${CMAKE_BINARY_DIR}/cmake/${PKG_NAME}ConfigVersion.cmake
+    VERSION "${version}"
+    COMPATIBILITY AnyNewerVersion
 )
 
-# --------------------------------------------------------------
-# Source code distribution
-# --------------------------------------------------------------
-
+# Create source code distribution
 if (GIT_FOUND)
     # Add target to build source code distribution
-    set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
+    set(ARCHIVE_NAME ${PKG_NAME}-${PROJECT_VERSION})
     set(ARCHIVE_TARBALL ${ARCHIVE_NAME}.tar.gz)
     add_custom_target(dist
         COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD |
@@ -164,10 +224,33 @@ fi"
     endif (UNIX)
 endif (GIT_FOUND)
 
-# --------------------------------------------------------------
-# Build preparations
-# --------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
+# Install
+# ------------------------------------------------------------------------------------------
 
-# Create build output directories
-file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
-file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
+# --- Files
+
+# Configuration header file
+install(FILES ${BINARY_INCLUDEDIR}/xyz_config.h
+        DESTINATION ${INSTALL_INCLUDEDIR})
+
+# CMake packaging files
+install(FILES
+        ${CMAKE_BINARY_DIR}/cmake/${PKG_NAME}Config.cmake
+        ${CMAKE_BINARY_DIR}/cmake/${PKG_NAME}ConfigVersion.cmake
+        ${CMAKE_BINARY_DIR}/cmake/${PKG_NAME}ConfigExtras.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PKG_NAME})
+
+# --- `uninstall`
+
+# Generate cmake_uninstall.cmake file
+configure_file(
+    "${CMAKE_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY
+)
+
+# Define `uninstall` target
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake
+)
