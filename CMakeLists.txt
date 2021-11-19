@@ -31,6 +31,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Build shared libraries
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
+# Floating-point precision
+option(USE_SINGLE_PRECISION "Build single-precision libraries" OFF)
+if (USE_SINGLE_PRECISION)
+    message("-- Setting floating-point precision to 'single'")
+else (USE_SINGLE_PRECISION)
+    message("-- Setting floating-point precision to 'double'")
+endif (USE_SINGLE_PRECISION)
+
 # ------------------------------------------------------------------------------------------
 # Imported Modules
 # ------------------------------------------------------------------------------------------
@@ -99,6 +107,27 @@ set(INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/${PKG_DIR_NAME})
 # ------------------------------------------------------------------------------------------
 
 # --- Process template files
+
+# Floating-point precision
+if (USE_SINGLE_PRECISION)
+
+    set(XYZ_REAL "float")
+    set(XYZ_ZERO_APPROX 1.e-5)
+    set(XYZ_REAL_MAX "FLT_MAX")
+    set(XYZ_REAL_MIN "FLT_MIN")
+    set(XYZ_REAL_EPSILON "FLT_EPSILON")
+
+else (USE_SINGLE_PRECISION)
+
+    set(XYZ_DOUBLE_PRECISION ON)
+
+    set(XYZ_REAL "double")
+    set(XYZ_ZERO_APPROX 1.e-11)
+    set(XYZ_REAL_MAX "DBL_MAX")
+    set(XYZ_REAL_MIN "DBL_MIN")
+    set(XYZ_REAL_EPSILON "DBL_EPSILON")
+
+endif (USE_SINGLE_PRECISION)
 
 # Generate configuration header files
 configure_file(include/xyz_config.h.in
@@ -203,7 +232,7 @@ endif (GIT_FOUND)
 
 # Configuration header file
 install(FILES ${BINARY_INCLUDEDIR}/xyz_config.h
-        DESTINATION ${INSTALL_HEADER_PATH})
+        DESTINATION ${INSTALL_INCLUDEDIR})
 
 # CMake packaging files
 install(FILES

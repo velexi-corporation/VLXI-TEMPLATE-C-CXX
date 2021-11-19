@@ -17,4 +17,22 @@
 #define XYZ_VERSION_MINOR @XYZ_VERSION_MINOR@
 #define XYZ_VERSION_PATCH @XYZ_VERSION_PATCH@
 
+/* Macro defined if double precision library is being built. */
+#cmakedefine XYZ_DOUBLE_PRECISION
+
+/* Floating-point precision for XYZ_REAL */
+#define XYZ_REAL @XYZ_REAL@
+
+/* Zero approximation */
+#define XYZ_ZERO_APPROX @XYZ_ZERO_APPROX@
+
+/* Maximum value for XYZ_REAL */
+#define XYZ_REAL_MAX @XYZ_REAL_MAX@
+
+/* Minimum value for XYZ_REAL */
+#define XYZ_REAL_MIN @XYZ_REAL_MIN@
+
+/* Machine epsilon value for XYZ_REAL */
+#define XYZ_REAL_EPSILON @XYZ_REAL_EPSILON@
+
 #endif
