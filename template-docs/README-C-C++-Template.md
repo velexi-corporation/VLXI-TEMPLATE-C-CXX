@@ -1,4 +1,4 @@
-C/C++ Package Template (0.1.0)
+C/C++ Package Template (0.1.1)
 ==============================
 
 ___Authors___  
