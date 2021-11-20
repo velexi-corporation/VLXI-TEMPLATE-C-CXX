@@ -14,6 +14,14 @@ Table of Contents
 
 2. [Installation][#2]
 
+   2.1. [Building the Package][#2.1]
+
+   2.2. [Running Tests][#2.2]
+
+   2.3. [Installing the Package][#2.3]
+
+   2.4. [Uninstalling the Package][#2.4]
+
 3. [Known Issues][#3]
 
 ------------------------------------------------------------------------------
@@ -34,7 +42,76 @@ See the LICENSE file for copyright and license information.
 
 ## 2. Installation
 
-PLACEHOLDER
+### 2.1. Building the Package
+
+* Create a `build` directory, and change into it.
+
+  ```shell
+  $ mkdir build
+  $ cd build
+  ```
+
+* Generate the build files.
+
+  ```shell
+  $ cmake ..
+  ```
+
+* Build the package.
+
+  ```shell
+  $ make
+  ```
+
+### 2.2. Running Tests
+
+* From the `build` directory, use `make tests` to build the unit tests.
+
+  ```shell
+  $ make tests
+  ```
+
+* From the `build` directory, use `ctest` or `make test` to run the unit tests.
+
+  ```shell
+  $ ctest
+  ```
+
+  For a more detailed test report, use `ctest --verbose`.
+
+  ```shell
+  $ ctest --verbose
+  ```
+
+### 2.3. Installing the Package
+
+* Set the installation location for the package.
+
+  ```shell
+  $ cd build
+  $ cmake -DCMAKE_INSTALL_PREFIX=/PATH/TO/INSTALL/LOCATION ..
+  ```
+
+  __Note__: the `-DCMAKE_INSTALL_PREFIX` option could have been included in
+  the command used when generating the build files.
+
+* Use `make install` to install the package.
+
+  ```shell
+  $ make install
+  ```
+
+* (OPTIONAL) Remove the `build` directory.
+
+### 2.4. Uninstalling the Package
+
+* To uninstall the package, use `make uninstall` from within the `build`
+  directory.
+
+  ```shell
+  $ cd build
+  $ make uninstall
+  ```
 
 ------------------------------------------------------------------------------
 
@@ -51,6 +128,10 @@ PLACEHOLDER
 [#1.2]: #12-license
 
 [#2]: #2-installation
+[#2.1]: #21-building-the-package
+[#2.2]: #22-running-tests
+[#2.3]: #23-installing-the-package
+[#2.4]: #24-uninstalling-the-package
 
 [#3]: #3-known-issues
 
